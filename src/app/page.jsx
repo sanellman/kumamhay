@@ -6,6 +6,7 @@ export default function HomePage() {
   const [tiles, setTiles] = useState(initialTiles)
   const [seconds, setSeconds] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [showNumbers, setShowNumbers] = useState(false)
   const timerRef = useRef(null)
 
   // นับเวลา
@@ -51,11 +52,28 @@ export default function HomePage() {
 
   // ฟังก์ชันสุ่ม
   const shuffleTiles = () => {
-    const shuffled = [...initialTiles]
-      .sort(() => Math.random() - 0.5) // สุ่มง่ายๆ
+    let shuffled
+    do {
+      shuffled = [...initialTiles].sort(() => Math.random() - 0.5)
+    } while (!isSolvable(shuffled)) // ทำให้สุ่มแล้วแก้ได้
     setTiles(shuffled)
     setSeconds(0)
     setIsPlaying(true)
+    setShowNumbers(true) // หลัง shuffle ให้เลขโชว์
+  }
+
+  // ฟังก์ชันเช็ค solvable
+  const isSolvable = (arr) => {
+    const inversions = arr
+      .filter((n) => n !== null)
+      .reduce((acc, curr, i, src) => {
+        return (
+          acc +
+          src.slice(i + 1).filter((x) => x < curr).length
+        )
+      }, 0)
+    const emptyRow = Math.floor(arr.indexOf(null) / 4)
+    return (emptyRow % 2 === 0) !== (inversions % 2 === 0)
   }
 
   return (
@@ -94,13 +112,20 @@ export default function HomePage() {
             <button
               key={i}
               onClick={() => moveTile(i)}
-              className="rounded-lg overflow-hidden"
+              className="rounded-lg overflow-hidden relative"
               style={{
                 backgroundImage: "url('/kuma.jpg')",
                 backgroundSize: '400% 400%',
                 backgroundPosition: `${(col / 3) * 100}% ${(row / 3) * 100}%`,
               }}
-            />
+            >
+              {/* ตัวเลขจาง ๆ แสดงเฉพาะเมื่อกดเริ่ม */}
+              {showNumbers && (
+                <span className="absolute inset-0 flex items-center justify-center text-white/30 font-bold text-sm md:text-base">
+                  {tile + 1}
+                </span>
+              )}
+            </button>
           )
         })}
       </div>
