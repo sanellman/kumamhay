@@ -72,7 +72,7 @@ export default function HomePage() {
         onClick={shuffleTiles}
         className="px-4 py-2 bg-white text-black rounded-lg font-semibold hover:bg-gray-200 transition"
       >
-        Shuffle
+        เริ่มเกม
       </button>
 
       {/* กระดานเกม */}
